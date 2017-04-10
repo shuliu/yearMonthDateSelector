@@ -60,6 +60,7 @@ $.fn.yearMonthDateSelector = function(options) {
     // 若年份為空 或是 原option range與設定不同
     if (settings.year.find('option').length === 0 || settings.year.find('option:eq(0)').val() !== settings.maxYear || settings.year.find('option:eq(-1)').val() !== settings.minYear) {
       settings.month.empty();
+      settings.year.append($('<option>').val('').text('西元年'));
       for (var i = settings.maxYear; i >= settings.minYear; i--) {
         settings.year.append($('<option>').val(i).text(settings.formatYear.replace(/{{year}}/g, i)));
       }
@@ -69,6 +70,7 @@ $.fn.yearMonthDateSelector = function(options) {
   then.setMonthOption = function() {
     if (settings.month.find('option').length < 12) {
       settings.month.empty();
+      settings.month.append($('<option>').val('').text('月份'));
       for (var i = 1; i <= 12; i++) {
         settings.month.append($('<option>').val(i).text(settings.formatMonth.replace(/{{month}}/g, i)));
       }
@@ -80,6 +82,8 @@ $.fn.yearMonthDateSelector = function(options) {
     var _month = parseInt(settings.month.val(), 10);
     var _date = parseInt(settings.date.val(), 10);
     if (isNaN(_month) || isNaN(_year)) {
+      settings.date.empty();
+      settings.date.append($('<option>').val('').text('日期'));
       return false;
     }
 
