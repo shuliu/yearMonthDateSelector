@@ -91,7 +91,7 @@ $.fn.yearMonthDateSelector = function(options) {
     if (_month === 4 || _month === 6 || _month === 9 || _month === 11) {
       dateLength = 30;
     } else if (_month === 2) {
-      dateLength = (_year % 4 == 0 && (_year % 100 != 0 || _year % 400 == 0)) ? 28 : 29;
+      dateLength = (_year % 4 == 0 && (_year % 100 != 0 || _year % 400 == 0)) ? 29 : 28;
     }
 
     // 重建
