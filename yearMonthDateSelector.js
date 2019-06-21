@@ -1,5 +1,5 @@
 /* *
- * year-month-date-selector-plugin v1.0.0 @sh
+ * year-month-date-selector-plugin v1.0.1 @sh
  * 年月日 三連動 selector
  * */
 $.fn.yearMonthDateSelector = function(options) {
@@ -10,9 +10,9 @@ $.fn.yearMonthDateSelector = function(options) {
     month: $(this).find('select:eq(1)'),
     date: $(this).find('select:eq(2)'),
     // 畫面呈現的格式, 與 submit value 無關
-    formatYear: "西元{{year}}年",
-    formatMonth: "{{month}}月",
-    formatDate: "{{date}}日",
+    formatYear: '西元{{year}}年',
+    formatMonth: '{{month}}月',
+    formatDate: '{{date}}日',
     // 最大最小顯示年份 , null表示自動(當前年份至1900)
     maxYear: null,
     minYear: 1900,
@@ -22,7 +22,8 @@ $.fn.yearMonthDateSelector = function(options) {
 
   then._init = function() {
     // 若元素有缺則停止
-    if (settings.year.length !== 1 || settings.month.length !== 1 || settings.date.length !== 1) {
+    if (settings.year.length !== 1 || settings.month.length !== 1 ||
+        settings.date.length !== 1) {
       window.console && console.log('無法取得元素');
       return false;
     }
@@ -54,15 +55,21 @@ $.fn.yearMonthDateSelector = function(options) {
   // 檢查年份 range 並建立年份
   then.setYearOption = function() {
     // 若設定值 maxYear 有誤
-    if (isNaN(settings.maxYear) || (settings.maxYear > new Date().getFullYear()) || (settings.maxYear < settings.minYear)) {
+    if (isNaN(settings.maxYear) ||
+        (settings.maxYear > new Date().getFullYear()) ||
+        (settings.maxYear < settings.minYear)) {
       settings.maxYear = new Date().getFullYear();
     }
     // 若年份為空 或是 原option range與設定不同
-    if (settings.year.find('option').length === 0 || settings.year.find('option:eq(0)').val() !== settings.maxYear || settings.year.find('option:eq(-1)').val() !== settings.minYear) {
+    if (settings.year.find('option').length === 0 ||
+        settings.year.find('option:eq(0)').val() !== settings.maxYear ||
+        settings.year.find('option:eq(-1)').val() !== settings.minYear) {
       settings.month.empty();
       settings.year.append($('<option>').val('').text('西元年'));
       for (var i = settings.maxYear; i >= settings.minYear; i--) {
-        settings.year.append($('<option>').val(i).text(settings.formatYear.replace(/{{year}}/g, i)));
+        settings.year.append($('<option>').
+            val(i).
+            text(settings.formatYear.replace(/{{year}}/g, i)));
       }
     }
   };
@@ -72,7 +79,9 @@ $.fn.yearMonthDateSelector = function(options) {
       settings.month.empty();
       settings.month.append($('<option>').val('').text('月份'));
       for (var i = 1; i <= 12; i++) {
-        settings.month.append($('<option>').val(i).text(settings.formatMonth.replace(/{{month}}/g, i)));
+        settings.month.append($('<option>').
+            val(i).
+            text(settings.formatMonth.replace(/{{month}}/g, i)));
       }
     }
   };
@@ -90,20 +99,48 @@ $.fn.yearMonthDateSelector = function(options) {
     var dateLength = 31;
     if (_month === 4 || _month === 6 || _month === 9 || _month === 11) {
       dateLength = 30;
-    } else if (_month === 2) {
-      dateLength = (_year % 4 == 0 && (_year % 100 != 0 || _year % 400 == 0)) ? 29 : 28;
+    }
+    else if (_month === 2) {
+      dateLength = (_year % 4 === 0 && (_year % 100 !== 0 || _year % 400 === 0))
+          ? 29
+          : 28;
     }
 
     // 重建
     settings.date.empty();
     for (var i = 1; i <= dateLength; i++) {
-      settings.date.append($('<option>').val(i).text(settings.formatDate.replace(/{{date}}/g, i)));
+      settings.date.append($('<option>').
+          val(i).
+          text(settings.formatDate.replace(/{{date}}/g, i)));
     }
     // 鎖定原select
-    settings.date.find('option:eq(' + ( (_date < dateLength) ? (_date - 1) : (dateLength - 1) ) + ')').prop('selected', true);
+    settings.date.find(
+        'option:eq(' + ((_date < dateLength) ? (_date - 1) : (dateLength - 1)) +
+        ')').prop('selected', true);
 
   };
 
-  then._init();
-  then._initEvent();
+  // 設定初始值
+  this.setYearValue = function() {
+    $(settings.year).val(settings.year.data('val')).trigger('change');
+  };
+  this.setMonthValue = function() {
+    $(settings.month).val(settings.month.data('val')).trigger('change');
+  };
+  this.setDateValue = function() {
+    $(settings.date).val(settings.date.data('val')).trigger('change');
+  };
+
+  $.when(
+      then._init(),
+      then._initEvent(),
+      then.setYearValue(),
+      then.setMonthValue(),
+      then.setDateValue(),
+      $.Deferred(function(deferred) {
+        return $(deferred.resolve);
+      })
+  ).done(function() {
+    console.log('ready');
+  });
 };
